@@ -2,7 +2,7 @@ package com.pulley.captrivia;
 
 import com.pulley.captrivia.model.questions.Question;
 import com.pulley.captrivia.model.questions.QuestionsLoader;
-import com.pulley.captrivia.resources.LeaderboardResource;
+import com.pulley.captrivia.resources.GameResource;
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
@@ -38,8 +38,8 @@ public class CaptriviaApp extends Application<CaptriviaAppConfiguration> {
         allowAllCORS(environment);
 
         // Set up the resources
-        LeaderboardResource leaderboardResource = new LeaderboardResource();
-        environment.jersey().register(leaderboardResource);
+        GameResource GameResource = new GameResource();
+        environment.jersey().register(GameResource);
     }
 
     private void allowAllCORS(Environment environment) {

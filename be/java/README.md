@@ -10,7 +10,7 @@ java -jar ./target/captrivia-1.0-SNAPSHOT.jar server captrivia.yml
 
 It currently exposes a single API endpoint:
 ```bash
-curl localhost:8080/leaderboard
+curl localhost:8080/games
 ```
 
 You can also run in Docker.  This will likely be slower for development, especially if you're running on a non-Linux machine, but you should test that it runs in Docker as we run it in Docker when we grade it.

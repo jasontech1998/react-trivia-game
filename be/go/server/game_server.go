@@ -12,20 +12,20 @@ func NewGameServer() *GameServer {
 	return &GameServer{}
 }
 
-// Leaderboard writes the global leaderboard to the response.
-func (g *GameServer) Leaderboard(w http.ResponseWriter, r *http.Request) {
+// Games writes the existing games to the response.
+func (g *GameServer) Games(w http.ResponseWriter, r *http.Request) {
 	// TODO: Fix this data so it is not hardcoded, and is the right shape
-	// that the frontend expects, or maybe not worry about leaderboards at all!
-	leaderboard := []struct {
-		Name  string
-		Score float64
+	// that the frontend expects
+	games := []struct {
+		Name          string
+		QuestionCount int
+		State         string
 	}{
-		{"Alice", 89.79},
-		{"John", 65.35},
-		{"James", 15.92},
-		{"Janice", 3.14},
+		{"Game 1", 5, "countdown"},
+		{"John's Game", 3, "waiting"},
+		{"Unnamed Game", 6, "ended"},
 	}
-	writeJSON(w, http.StatusOK, leaderboard)
+	writeJSON(w, http.StatusOK, games)
 }
 
 func writeJSON(w http.ResponseWriter, statusCode int, obj any) error {
