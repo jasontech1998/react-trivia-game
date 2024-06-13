@@ -5,7 +5,7 @@ import "net/http"
 func NewRouter(gameServer *GameServer) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /leaderboard", gameServer.Leaderboard) // Get global leaderboard
+	mux.HandleFunc("GET /games", gameServer.Games) // Get existing games
 
 	return mux
 }

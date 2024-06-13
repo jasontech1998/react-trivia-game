@@ -13,7 +13,7 @@ This will start a nodemon process to automatically reload on file changes.  If y
 
 It currently exposes a single API endpoint:
 ```bash
-curl localhost:8080/leaderboard
+curl localhost:8080/games
 ```
 
 We have also configured eslint for you; you can invoke it with `npm run lint`.
