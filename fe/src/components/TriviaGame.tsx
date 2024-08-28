@@ -6,6 +6,7 @@ import CreateGameForm from './CreateGameForm';
 import GameList from './GameList';
 import WaitingRoom from './WaitingRoom';
 import GameInfo from './GameInfo';
+import GameOverDisplay from './GameOverDisplay';
 import confetti from 'canvas-confetti';
 
 const api = new Api('http://localhost:8080');
@@ -433,7 +434,7 @@ const TriviaGame: React.FC = () => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-teal-100 to-cyan-100 p-4 flex items-center justify-center">
 			<div className={`relative w-full max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isInGame ? 'flex flex-col sm:flex-row' : 'block'}`}>
-				{/* Top card - Game Info or Game List */}
+				{/* Top card - Game Info or Game Over Display */}
 				<div className={`bg-gradient-to-r from-emerald-400 to-cyan-500 shadow-lg rounded-3xl transition-all duration-500 ease-in-out
 					${isConnected ? 'opacity-100' : 'opacity-0 pointer-events-none'}
 					${isInGame ? 'w-full sm:w-1/3 mb-4 sm:mb-0 sm:mr-4' : 'w-full mb-4'}`}>
@@ -445,6 +446,12 @@ const TriviaGame: React.FC = () => {
 									players={players}
 									scores={scores}
 									playerName={playerName}
+								/>
+							) : leavingCountdown !== null ? (
+								<GameOverDisplay
+									scores={scores}
+									playerName={playerName}
+									leavingCountdown={leavingCountdown}
 								/>
 							) : isWaiting ? (
 								<WaitingRoom
@@ -565,8 +572,7 @@ const TriviaGame: React.FC = () => {
 													</div>
 													{lastCorrectPlayer && (
 														<div className="bg-emerald-100 border-l-4 border-emerald-500 text-emerald-700 p-4 mb-4 rounded-r-lg animate-pulse">
-															<p className="font-bold">Correct Answer!</p>
-															<p>{lastCorrectPlayer} answered correctly.</p>
+															<p className="font-bold">{lastCorrectPlayer} answered correctly!</p>
 														</div>
 													)}
 													<ul className="space-y-2 mb-4">
@@ -587,9 +593,7 @@ const TriviaGame: React.FC = () => {
 																						: 'bg-red-500 text-white'
 																				: correctAnswer === option
 																					? 'bg-emerald-500 text-white animate-pulse'
-																					: incorrectPlayers.includes(playerName) && !selectedAnswer
-																						? 'bg-red-100'
-																						: 'bg-gray-100 hover:bg-gray-200'
+																					: 'bg-gray-100 hover:bg-gray-200'
 																		}
 																		${selectedAnswer !== null || correctAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}
 																	`}
@@ -600,22 +604,9 @@ const TriviaGame: React.FC = () => {
 															</li>
 														))}
 													</ul>
-													{incorrectPlayers.length > 0 && (
-														<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-r-lg animate-fade-in">
-															<p className="font-bold">Incorrect Answers:</p>
-															<p>{incorrectPlayers.join(', ')}</p>
-														</div>
-													)}
-													{incorrectPlayers.length === players.length && (
-														<div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded-r-lg animate-bounce">
-															<p className="font-bold">No Correct Answers!</p>
-															<p>All players answered incorrectly.</p>
-														</div>
-													)}
 													{correctAnswer && (
 														<div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-r-lg animate-fade-in">
-															<p className="font-bold">Correct Answer Revealed:</p>
-															<p>{correctAnswer}</p>
+															<p className="font-bold">Correct Answer: {correctAnswer}</p>
 														</div>
 													)}
 												</div>
