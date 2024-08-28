@@ -23,7 +23,4 @@ export class Api {
 		return response.json();
 	}
 
-	// ... (previous methods)
-
-	// Remove the fetchTotalQuestions method
 }
