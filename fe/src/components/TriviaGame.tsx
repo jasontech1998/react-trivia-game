@@ -17,7 +17,6 @@ import GameInfo from "./GameInfo";
 import GameOverDisplay from "./GameOverDisplay";
 
 const TriviaGame: React.FC = () => {
-  // Custom hooks
   const {
     games,
     setGames,
@@ -26,11 +25,9 @@ const TriviaGame: React.FC = () => {
     fetchGames,
   } = useGames();
 
-  // useRef hooks
   const wsRef = useRef<WebSocket | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // useState hooks
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
   const [currentQuestion, setCurrentQuestion] =
@@ -51,7 +48,6 @@ const TriviaGame: React.FC = () => {
   const [playerName, setPlayerName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
-  // Effects
   useEffect(() => {
     if (wsRef.current) {
       wsRef.current.onmessage = handleMessage;
@@ -183,7 +179,6 @@ const TriviaGame: React.FC = () => {
     setError(null);
     setLeavingCountdown(null);
 
-    // Fetch the updated game list
     fetchGames();
   };
 
@@ -463,13 +458,10 @@ const TriviaGame: React.FC = () => {
     }
   };
 
-  // Render helpers
-  const isInGame =
-    currentGame &&
-    ["countdown", "question", "ended"].includes(currentGame.state);
-  const isWaiting = currentGame && currentGame.state === "waiting";
+  const gameState = currentGame?.state;
+  const isInGame = gameState && ["countdown", "question", "ended"].includes(gameState);
+  const isWaiting = gameState === "waiting";
 
-  // Main render
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-100 to-cyan-100 p-4 flex items-center justify-center">
       <div
