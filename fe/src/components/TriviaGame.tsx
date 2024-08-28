@@ -56,10 +56,6 @@ const TriviaGame: React.FC = () => {
 
 		const ws = new WebSocket(`ws://localhost:8080/connect?name=${encodeURIComponent(name)}`);
 
-		ws.onopen = () => {
-			// Wait for the connection_success message before setting isConnected to true
-		};
-
 		ws.onmessage = (event) => {
 			const data = JSON.parse(event.data);
 			console.log('Received message:', data);
