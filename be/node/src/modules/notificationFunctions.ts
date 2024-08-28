@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { Game } from '../types';
-import { broadcastToGame, broadcastGameList, broadcastConnectedPlayers } from '../gameHandlers';
+import { broadcastToGame, broadcastGameList, broadcastConnectedPlayers } from './broadcastFunctions';
 
 export function sendWelcomeMessages(webSocket: WebSocket, playerName: string, wss: WebSocket.Server, games: Game[], clients: Map<WebSocket, string>) {
   webSocket.send(JSON.stringify({ type: 'connection_success', playerName }));

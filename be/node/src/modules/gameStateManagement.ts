@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { Game, GameState } from '../types';
-import { broadcastToAll, broadcastConnectedPlayers, broadcastGameList } from '../gameHandlers';
+import { broadcastToAll, broadcastConnectedPlayers, broadcastGameList } from './broadcastFunctions';
 
 export function removeGame(game: Game, games: Game[], wss: WebSocket.Server) {
   const index = games.findIndex(g => g.id === game.id);

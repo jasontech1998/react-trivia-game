@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
-import { Game, GameState } from '../types';
-import { handleMessage, broadcastToAll, broadcastToGame, broadcastGameList, broadcastConnectedPlayers } from '../gameHandlers';
+import { Game } from '../types';
+import { handleMessage } from '../messageHandler';
 import { getPlayerName, isValidPlayerName, addClientToGame, removePlayerFromGame } from './playerManagement';
 import { removeGame, updateGameState } from './gameStateManagement';
 import { sendWelcomeMessages, sendErrorAndClose, notifyPlayersOfDeparture } from './notificationFunctions';
