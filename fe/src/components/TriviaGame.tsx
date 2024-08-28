@@ -10,9 +10,15 @@ import confetti from 'canvas-confetti';
 import { useGames } from '../hooks/useGames';
 
 const TriviaGame: React.FC = () => {
+	// Custom hooks
 	const { games, setGames, isLoading, error: apiError, fetchGames } = useGames();
-	const [isConnected, setIsConnected] = useState<boolean>(false);
+
+	// useRef hooks
 	const wsRef = useRef<WebSocket | null>(null);
+	const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+	// useState hooks
+	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const [currentGame, setCurrentGame] = useState<Game | null>(null);
 	const [currentQuestion, setCurrentQuestion] = useState<QuestionPayload | null>(null);
 	const [scores, setScores] = useState<Score[]>([]);
@@ -20,17 +26,16 @@ const TriviaGame: React.FC = () => {
 	const [isLeader, setIsLeader] = useState<boolean>(false);
 	const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 	const [timeLeft, setTimeLeft] = useState<number>(10);
-	const timerRef = useRef<NodeJS.Timeout | null>(null);
 	const [countdown, setCountdown] = useState<number | null>(null);
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null);
 	const [lastCorrectPlayer, setLastCorrectPlayer] = useState<string | null>(null);
-	const [incorrectPlayers, setIncorrectPlayers] = useState<string[]>([]);
 	const [gameMessages, setGameMessages] = useState<string[]>([]);
 	const [connectedPlayers, setConnectedPlayers] = useState<string[]>([]);
 	const [leavingCountdown, setLeavingCountdown] = useState<number | null>(null);
 	const [playerName, setPlayerName] = useState<string>('');
 	const [error, setError] = useState<string | null>(null);
 
+	// Connection Management
 	const handleConnect = (name: string) => {
 		if (!name.trim()) {
 			setError('Please enter a player name');
@@ -94,6 +99,7 @@ const TriviaGame: React.FC = () => {
 		setError(null);
 	};
 
+	// Game Management
 	const handleCreateGame = (gameName: string, questionCount: number) => {
 		if (!isConnected) {
 			setError('Please connect to the server first');
@@ -133,17 +139,6 @@ const TriviaGame: React.FC = () => {
 		wsRef.current?.send(JSON.stringify(startCommand));
 	};
 
-	const handleAnswer = (answer: string) => {
-		if (!currentGame || !currentQuestion) return;
-		const answerCommand = {
-			nonce: Date.now().toString(),
-			type: 'answer',
-			payload: { gameId: currentGame.id, answer }
-		};
-		wsRef.current?.send(JSON.stringify(answerCommand));
-		setSelectedAnswer(answer);
-	};
-
 	const handleReturnToLobby = () => {
 		if (currentGame) {
 			const leaveCommand = {
@@ -175,6 +170,19 @@ const TriviaGame: React.FC = () => {
 		wsRef.current?.send(JSON.stringify(destroyCommand));
 	};
 
+	// Gameplay
+	const handleAnswer = (answer: string) => {
+		if (!currentGame || !currentQuestion) return;
+		const answerCommand = {
+			nonce: Date.now().toString(),
+			type: 'answer',
+			payload: { gameId: currentGame.id, answer }
+		};
+		wsRef.current?.send(JSON.stringify(answerCommand));
+		setSelectedAnswer(answer);
+	};
+
+	// Visual Effects
 	const shootConfetti = () => {
 		confetti({
 			particleCount: 100,
@@ -211,6 +219,7 @@ const TriviaGame: React.FC = () => {
 		}, 250);
 	};
 
+	// Message Handling
 	const handleMessage = (event: MessageEvent) => {
 		const data = JSON.parse(event.data);
 		console.log('Received message:', data);
@@ -273,7 +282,6 @@ const TriviaGame: React.FC = () => {
 				break;
 			case 'game_start':
 				setCurrentGame(prevGame => prevGame && prevGame.id === data.payload.gameId ? { ...prevGame, state: 'countdown' } : prevGame);
-				// Initialize scores for all players
 				setScores(data.payload.players.map((player: string) => ({ name: player, score: 0 })));
 				break;
 			case 'countdown':
@@ -285,7 +293,6 @@ const TriviaGame: React.FC = () => {
 				setSelectedAnswer(null);
 				setCorrectAnswer(null);
 				setLastCorrectPlayer(null);
-				setIncorrectPlayers([]);
 				setTimeLeft(10);
 				if (timerRef.current) clearInterval(timerRef.current);
 				timerRef.current = setInterval(() => {
@@ -314,13 +321,6 @@ const TriviaGame: React.FC = () => {
 				setScores(correctAnswerPayload.scores);
 				if (correctAnswerPayload.playerName === playerName) {
 					shootConfetti();
-				}
-				break;
-			case 'incorrect_answer':
-				setIncorrectPlayers(prev => [...prev, data.payload.playerName]);
-				if (data.payload.playerName === playerName) {
-					// This is the current player's incorrect answer
-					// We don't need to reset selectedAnswer here anymore
 				}
 				break;
 			case 'time_up':
@@ -402,6 +402,7 @@ const TriviaGame: React.FC = () => {
 		}
 	};
 
+	// Effects
 	useEffect(() => {
 		if (wsRef.current) {
 			wsRef.current.onmessage = handleMessage;
@@ -414,9 +415,11 @@ const TriviaGame: React.FC = () => {
 		}
 	}, [timeLeft]);
 
+	// Render helpers
 	const isInGame = currentGame && ['countdown', 'question', 'ended'].includes(currentGame.state);
 	const isWaiting = currentGame && currentGame.state === 'waiting';
 
+	// Main render
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-teal-100 to-cyan-100 p-4 flex items-center justify-center">
 			<div className={`relative w-full max-w-4xl mx-auto transition-all duration-500 ease-in-out ${isInGame ? 'flex flex-col sm:flex-row' : 'block'}`}>
