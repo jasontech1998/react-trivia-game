@@ -1,13 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Game, GameJoinedPayload, QuestionPayload, CorrectAnswerPayload, GameEndPayload, Score } from '../types';
-import ConnectionForm from './ConnectionForm';
-import CreateGameForm from './CreateGameForm';
-import GameList from './GameList';
-import WaitingRoom from './WaitingRoom';
-import GameInfo from './GameInfo';
-import GameOverDisplay from './GameOverDisplay';
-import confetti from 'canvas-confetti';
-import { useGames } from '../hooks/useGames';
+import React, { useEffect, useState, useRef } from 'react'
+import confetti from 'canvas-confetti'
+import { useGames } from '../hooks/useGames'
+import {
+  Game,
+  GameJoinedPayload,
+  QuestionPayload,
+  CorrectAnswerPayload,
+  GameEndPayload,
+  Score
+} from '../types'
+import ConnectionForm from './ConnectionForm'
+import CreateGameForm from './CreateGameForm'
+import GameList from './GameList'
+import WaitingRoom from './WaitingRoom'
+import GameInfo from './GameInfo'
+import GameOverDisplay from './GameOverDisplay'
 
 const TriviaGame: React.FC = () => {
 	// Custom hooks
