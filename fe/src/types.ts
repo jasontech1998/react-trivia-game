@@ -5,6 +5,7 @@ export interface Game {
   playerCount: number;
   playerNames: string[];
   state: 'waiting' | 'countdown' | 'question' | 'ended';
+  winner?: string;
 }
 
 export interface Player {

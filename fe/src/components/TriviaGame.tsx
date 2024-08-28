@@ -180,6 +180,7 @@ const TriviaGame: React.FC = () => {
 		setIsLeader(false);
 		setGameMessages([]);
 		setError(null);
+		setLeavingCountdown(null);
 		
 		// Fetch the updated game list
 		fetchAndUpdateGameList();
@@ -369,6 +370,8 @@ const TriviaGame: React.FC = () => {
 						return prev - 1;
 					});
 				}, 1000);
+				// Remove the ended game from the games list
+				setGames(prevGames => prevGames.filter(g => g.id !== gameEndPayload.gameId));
 				break;
 			case 'game_destroy':
 				setGames(prevGames => prevGames.filter(g => g.id !== data.payload.gameId));

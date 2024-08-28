@@ -197,6 +197,19 @@ function startGame(gameId: string, games: Game[], wss: WebSocket.Server, clients
     }
   }, wss, clients);
 
+  // Broadcast game state update to all clients
+  broadcastToAll(JSON.stringify({
+    type: 'game_update',
+    payload: {
+      id: game.id,
+      name: game.name,
+      questionCount: game.questionCount,
+      playerCount: game.players.length,
+      playerNames: game.playerNames,
+      state: game.state
+    }
+  }), wss);
+
   let countdown = 3;
   const countdownInterval = setInterval(() => {
     broadcastToGame(game, {
@@ -206,14 +219,14 @@ function startGame(gameId: string, games: Game[], wss: WebSocket.Server, clients
     countdown--;
     if (countdown < 0) {
       clearInterval(countdownInterval);
-      askQuestion(game, wss, clients);
+      askQuestion(game, games, wss, clients);
     }
   }, 1000);
 }
 
-function askQuestion(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, string>) {
+function askQuestion(game: Game, games: Game[], wss: WebSocket.Server, clients: Map<WebSocket, string>) {
   if (game.currentQuestionIndex >= game.questionCount - 1) {
-    endGame(game, wss, clients);
+    endGame(game, games, wss, clients);
     return;
   }
 
@@ -232,6 +245,19 @@ function askQuestion(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, 
     }
   }, wss, clients);
 
+  // Broadcast game state update to all clients
+  broadcastToAll(JSON.stringify({
+    type: 'game_update',
+    payload: {
+      id: game.id,
+      name: game.name,
+      questionCount: game.questionCount,
+      playerCount: game.players.length,
+      playerNames: game.playerNames,
+      state: game.state
+    }
+  }), wss);
+
   // Clear any existing timers
   if (game.timer) {
     clearTimeout(game.timer);
@@ -240,12 +266,12 @@ function askQuestion(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, 
   // Set a new timer for the question duration (10 seconds)
   game.timer = setTimeout(() => {
     if (game.state === 'question') {
-      handleTimeUp(game, wss, clients);
+      handleTimeUp(game, games, wss, clients);
     }
   }, 10000);
 }
 
-function handleTimeUp(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, string>) {
+function handleTimeUp(game: Game, games: Game[], wss: WebSocket.Server, clients: Map<WebSocket, string>) {
   const currentQuestion = game.questions[game.currentQuestionIndex];
   broadcastToGame(game, {
     type: 'time_up',
@@ -263,7 +289,7 @@ function handleTimeUp(game: Game, wss: WebSocket.Server, clients: Map<WebSocket,
   // Move to the next question after 3 seconds
   game.timer = setTimeout(() => {
     game.players.forEach(p => p.answeredIncorrectly = false);
-    askQuestion(game, wss, clients);
+    askQuestion(game, games, wss, clients);
   }, 3000);
 }
 
@@ -300,7 +326,7 @@ function handleAnswer(ws: WebSocket, payload: { gameId: string, answer: string }
     // Move to the next question after 3 seconds
     game.timer = setTimeout(() => {
       game.players.forEach(p => p.answeredIncorrectly = false);
-      askQuestion(game, wss, clients);
+      askQuestion(game, games, wss, clients);
     }, 3000);
   } else {
     player.answeredIncorrectly = true;
@@ -310,7 +336,7 @@ function handleAnswer(ws: WebSocket, payload: { gameId: string, answer: string }
     }, wss, clients);
 
     if (allPlayersAnsweredIncorrectly(game)) {
-      handleTimeUp(game, wss, clients);
+      handleTimeUp(game, games, wss, clients);
     }
   }
 }
@@ -388,7 +414,7 @@ function leaveGame(ws: WebSocket, payload: { gameId: string }, games: Game[], cl
   broadcastGameList(wss, games);
 }
 
-function endGame(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, string>) {
+function endGame(game: Game, games: Game[], wss: WebSocket.Server, clients: Map<WebSocket, string>) {
   game.state = 'ended';
   const winner = game.players.reduce((prev, current) => (prev.score > current.score) ? prev : current);
   game.winner = winner.name;
@@ -400,16 +426,15 @@ function endGame(game: Game, wss: WebSocket.Server, clients: Map<WebSocket, stri
       winner: winner.name
     }
   }, wss, clients);
-  broadcastToAll(JSON.stringify({
-    type: 'game_update',
-    payload: {
-      id: game.id,
-      name: game.name,
-      questionCount: game.questionCount,
-      state: game.state,
-      winner: winner.name
-    }
-  }), wss);
+
+  // Remove the game from the games array
+  const gameIndex = games.findIndex(g => g.id === game.id);
+  if (gameIndex !== -1) {
+    games.splice(gameIndex, 1);
+  }
+
+  // Broadcast the updated game list to all clients
+  broadcastGameList(wss, games);
 }
 
 function allPlayersAnsweredIncorrectly(game: Game): boolean {
@@ -426,14 +451,16 @@ export function broadcastConnectedPlayers(wss: WebSocket.Server, clients: Map<We
 
 // Add this new function to broadcast the game list
 export function broadcastGameList(wss: WebSocket.Server, games: Game[]) {
-  const gameList = games.map(game => ({
-    id: game.id,
-    name: game.name,
-    questionCount: game.questionCount,
-    state: game.state,
-    playerNames: game.playerNames,
-    playerCount: game.players.length,
-    winner: game.winner
-  }));
+  const gameList = games
+    .filter(game => game.state === 'waiting')
+    .map(game => ({
+      id: game.id,
+      name: game.name,
+      questionCount: game.questionCount,
+      state: game.state,
+      playerNames: game.playerNames,
+      playerCount: game.players.length,
+      winner: game.winner
+    }));
   broadcastToAll(JSON.stringify({ type: 'game_list_update', payload: gameList }), wss);
 }
