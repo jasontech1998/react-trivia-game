@@ -1,10 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-import HelloWorld from './components/HelloWorld'
+import TriviaGame from './components/TriviaGame'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <HelloWorld />
+    <TriviaGame />
   </React.StrictMode>,
 )

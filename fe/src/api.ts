@@ -1,4 +1,5 @@
 import { Axios } from 'axios';
+import { Game } from './types';
 
 export interface LobbyGame {
 	id: string;
@@ -8,28 +9,21 @@ export interface LobbyGame {
 }
 
 export class Api {
-	url: string;
-	client: Axios;
+	private baseUrl: string;
 
-	constructor(url: string) {
-		if (url.endsWith('/')) {
-			url = url.slice(0, -1);
-		}
-
-		this.url = url;
-		this.client = new Axios({ baseURL: url });
+	constructor(baseUrl: string) {
+		this.baseUrl = baseUrl;
 	}
 
-	fetchGameList = async (): Promise<LobbyGame[]> => {
-		try {
-			const response = await this.client.get('/games');
-			if (response.status != 200) {
-				throw new Error('Failed to fetch game list');
-			}
-			return JSON.parse(response.data) as LobbyGame[];
-		} catch (error) {
-			console.error('Error fetching game list:', error);
-			throw error;
+	async getGames(): Promise<Game[]> {
+		const response = await fetch(`${this.baseUrl}/games`);
+		if (!response.ok) {
+			throw new Error('Failed to fetch games');
 		}
-	};
+		return response.json();
+	}
+
+	// ... (previous methods)
+
+	// Remove the fetchTotalQuestions method
 }

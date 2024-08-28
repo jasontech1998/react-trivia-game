@@ -1,14 +1,12 @@
-// Shuffle an array in place.  See https://stackoverflow.com/a/60662877.
-// function shuffle<T>(arr: T[]): T[] {
-const shuffle = <T,>(arr: T[]) => {
-  let j, x, index;
-  for (index = arr.length - 1; index > 0; index--) {
-    j = Math.floor(Math.random() * (index + 1));
-    x = arr[index];
-    arr[index] = arr[j];
-    arr[j] = x;
+// Shuffle an array and return the shuffled array.
+const shuffle = <T>(arr: T[]): T[] => {
+  const shuffled = [...arr]; // Create a copy of the array
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap elements
   }
-}
+  return shuffled;
+};
 
 export default {
   shuffle,
