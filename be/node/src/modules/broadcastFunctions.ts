@@ -2,7 +2,7 @@ import WebSocket from 'ws';
 import { Game, GameState } from '../types';
 
 export function broadcastToAll(message: string, wss: WebSocket.Server) {
-  wss.clients.forEach((client) => {
+  wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(message);
     }
@@ -10,7 +10,7 @@ export function broadcastToAll(message: string, wss: WebSocket.Server) {
 }
 
 export function broadcastToGame(game: Game, message: any, wss: WebSocket.Server, clients: Map<WebSocket, string>) {
-  wss.clients.forEach((client) => {
+  wss.clients.forEach(client => {
     if (client.readyState === WebSocket.OPEN) {
       const playerName = clients.get(client);
       if (playerName && game.players.some(p => p.name === playerName)) {
@@ -24,7 +24,7 @@ export function broadcastConnectedPlayers(wss: WebSocket.Server, clients: Map<We
   const connectedPlayers = Array.from(clients.values());
   broadcastToAll(JSON.stringify({
     type: 'player_connected',
-    payload: { connectedPlayers }
+    payload: { connectedPlayers },
   }), wss);
 }
 
@@ -38,7 +38,7 @@ export function broadcastGameList(wss: WebSocket.Server, games: Game[]) {
       state: game.state,
       playerNames: game.playerNames,
       playerCount: game.players.length,
-      winner: game.winner
+      winner: game.winner,
     }));
   broadcastToAll(JSON.stringify({ type: 'game_list_update', payload: gameList }), wss);
 }

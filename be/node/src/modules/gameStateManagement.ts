@@ -8,7 +8,7 @@ export function removeGame(game: Game, games: Game[], wss: WebSocket.Server) {
     games.splice(index, 1);
     broadcastToAll(JSON.stringify({
       type: 'game_destroy',
-      payload: { gameId: game.id }
+      payload: { gameId: game.id },
     }), wss);
   }
 }
@@ -28,7 +28,7 @@ export function createGame(name: string, questionCount: number, playerName: stri
     currentQuestionIndex: -1,
     questions: [],
     playerNames: [playerName],
-    timer: null
+    timer: null,
   };
 }
 

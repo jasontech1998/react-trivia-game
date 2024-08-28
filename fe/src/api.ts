@@ -1,4 +1,4 @@
-import { Axios } from 'axios';
+import axios, { Axios } from 'axios';
 import { Game } from './types';
 
 export interface LobbyGame {
@@ -9,18 +9,15 @@ export interface LobbyGame {
 }
 
 export class Api {
-	private baseUrl: string;
+	private axios: Axios;
 
 	constructor(baseUrl: string) {
-		this.baseUrl = baseUrl;
+		this.axios = axios.create({ baseURL: baseUrl });
 	}
 
 	async getGames(): Promise<Game[]> {
-		const response = await fetch(`${this.baseUrl}/games`);
-		if (!response.ok) {
-			throw new Error('Failed to fetch games');
-		}
-		return response.json();
+		const response = await this.axios.get<Game[]>('/games');
+		return response.data;
 	}
 
 }

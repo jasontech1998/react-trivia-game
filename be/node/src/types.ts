@@ -8,7 +8,7 @@ export enum GameState {
   Waiting = 'waiting',
   Countdown = 'countdown',
   Question = 'question',
-  Ended = 'ended'
+  Ended = 'ended',
 }
 
 export interface Game {

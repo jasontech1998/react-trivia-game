@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Api } from '../api';
-import { Game, GameJoinedPayload, QuestionPayload, CorrectAnswerPayload, GameEndPayload, Score, Player } from '../types';
+import { Game, GameJoinedPayload, QuestionPayload, CorrectAnswerPayload, GameEndPayload, Score } from '../types';
 import ConnectionForm from './ConnectionForm';
 import CreateGameForm from './CreateGameForm';
 import GameList from './GameList';
@@ -8,14 +7,10 @@ import WaitingRoom from './WaitingRoom';
 import GameInfo from './GameInfo';
 import GameOverDisplay from './GameOverDisplay';
 import confetti from 'canvas-confetti';
-
-const api = new Api('http://localhost:8080');
+import { useGames } from '../hooks/useGames';
 
 const TriviaGame: React.FC = () => {
-	const [games, setGames] = useState<Game[]>([]);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
-	const [playerName, setPlayerName] = useState<string>('');
+	const { games, setGames, isLoading, error: apiError, fetchGames } = useGames();
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 	const wsRef = useRef<WebSocket | null>(null);
 	const [currentGame, setCurrentGame] = useState<Game | null>(null);
@@ -33,24 +28,8 @@ const TriviaGame: React.FC = () => {
 	const [gameMessages, setGameMessages] = useState<string[]>([]);
 	const [connectedPlayers, setConnectedPlayers] = useState<string[]>([]);
 	const [leavingCountdown, setLeavingCountdown] = useState<number | null>(null);
-
-	const fetchAndUpdateGameList = () => {
-		api.getGames()
-			.then(games => {
-				setGames(games);
-				setIsLoading(false);
-				setError(null);
-			})
-			.catch(error => {
-				console.error('Failed to fetch game list:', error);
-				setError('Failed to update game list. Please refresh the page.');
-				setIsLoading(false);
-			});
-	};
-
-	useEffect(() => {
-		fetchAndUpdateGameList();
-	}, []);
+	const [playerName, setPlayerName] = useState<string>('');
+	const [error, setError] = useState<string | null>(null);
 
 	const handleConnect = (name: string) => {
 		if (!name.trim()) {
@@ -183,7 +162,7 @@ const TriviaGame: React.FC = () => {
 		setLeavingCountdown(null);
 		
 		// Fetch the updated game list
-		fetchAndUpdateGameList();
+		fetchGames();
 	};
 
 	const handleDestroyGame = () => {
@@ -398,7 +377,7 @@ const TriviaGame: React.FC = () => {
 				setScores([]);
 				setIsLeader(false);
 				setGameMessages([]);
-				fetchAndUpdateGameList();
+				fetchGames();
 				break;
 			case 'all_incorrect':
 				setCorrectAnswer(data.payload.correctAnswer);
@@ -495,6 +474,13 @@ const TriviaGame: React.FC = () => {
 						<div className="mx-auto max-w-2xl">
 							<h1 className="text-4xl font-bold mb-6 text-center text-emerald-600">Pulley Trivia Game</h1>
 							
+							{apiError && (
+								<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+									<p className="font-bold">Error</p>
+									<p>{apiError}</p>
+								</div>
+							)}
+
 							{error && (
 								<div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
 									<p className="font-bold">Error</p>

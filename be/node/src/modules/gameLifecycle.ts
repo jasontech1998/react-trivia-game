@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { v4 as uuidv4 } from 'uuid';
-import { Game, GameState, Player } from '../types';
+import { Game, GameState } from '../types';
 import utils from '../utils';
 import questions from '../questions.json';
 import { broadcastToAll, broadcastToGame, broadcastGameList } from './broadcastFunctions';
@@ -18,7 +18,7 @@ export function createGame(ws: WebSocket, payload: { name: string; question_coun
     currentQuestionIndex: -1,
     questions: [],
     playerNames: [playerName],
-    timer: null
+    timer: null,
   };
 
   games.push(newGame);
@@ -31,8 +31,8 @@ export function createGame(ws: WebSocket, payload: { name: string; question_coun
       questionCount: newGame.questionCount,
       playerCount: 1,
       playerNames: newGame.playerNames,
-      state: newGame.state
-    }
+      state: newGame.state,
+    },
   }), wss);
 
   ws.send(JSON.stringify({
@@ -43,8 +43,8 @@ export function createGame(ws: WebSocket, payload: { name: string; question_coun
       questionCount: newGame.questionCount,
       playerCount: 1,
       state: newGame.state,
-      players: newGame.playerNames
-    }
+      players: newGame.playerNames,
+    },
   }));
 
   broadcastGameList(wss, games);
@@ -77,8 +77,8 @@ export function joinGame(ws: WebSocket, payload: { gameId: string }, games: Game
         questionCount: game.questionCount,
         playerCount: game.players.length,
         state: game.state,
-        players: game.players.map(p => p.name)
-      }
+        players: game.players.map(p => p.name),
+      },
     }));
     return;
   }
@@ -94,8 +94,8 @@ export function joinGame(ws: WebSocket, payload: { gameId: string }, games: Game
       questionCount: game.questionCount,
       playerCount: game.players.length,
       playerNames: game.playerNames,
-      state: game.state
-    }
+      state: game.state,
+    },
   }), wss);
 
   ws.send(JSON.stringify({
@@ -106,19 +106,19 @@ export function joinGame(ws: WebSocket, payload: { gameId: string }, games: Game
       questionCount: game.questionCount,
       playerCount: game.players.length,
       state: game.state,
-      players: game.players.map(p => p.name)
-    }
+      players: game.players.map(p => p.name),
+    },
   }));
 
   broadcastToGame(game, {
     type: 'player_joined',
-    payload: { 
-      playerName, 
-      gameId: game.id, 
+    payload: {
+      playerName,
+      gameId: game.id,
       playerCount: game.players.length,
       players: game.players.map(p => p.name),
-      message: `${playerName} has joined the game.`
-    }
+      message: `${playerName} has joined the game.`,
+    },
   }, wss, clients);
 
   broadcastToAll(JSON.stringify({
@@ -126,8 +126,8 @@ export function joinGame(ws: WebSocket, payload: { gameId: string }, games: Game
     payload: {
       id: game.id,
       playerCount: game.players.length,
-      playerNames: game.playerNames
-    }
+      playerNames: game.playerNames,
+    },
   }), wss);
 }
 
@@ -137,20 +137,20 @@ export function startGame(gameId: string, games: Game[], wss: WebSocket.Server, 
 
   game.state = GameState.Countdown;
   game.currentQuestionIndex = -1;
-  
+
   if (questions.length === 0) {
     console.error('No questions available');
     return;
   }
-  
+
   game.questions = utils.shuffle([...questions]).slice(0, game.questionCount);
 
   broadcastToGame(game, {
     type: 'game_start',
-    payload: { 
+    payload: {
       gameId: game.id,
-      players: game.playerNames
-    }
+      players: game.playerNames,
+    },
   }, wss, clients);
 
   broadcastToAll(JSON.stringify({
@@ -161,15 +161,15 @@ export function startGame(gameId: string, games: Game[], wss: WebSocket.Server, 
       questionCount: game.questionCount,
       playerCount: game.players.length,
       playerNames: game.playerNames,
-      state: game.state
-    }
+      state: game.state,
+    },
   }), wss);
 
   let countdown = 3;
   const countdownInterval = setInterval(() => {
     broadcastToGame(game, {
       type: 'countdown',
-      payload: { gameId: game.id, countdown }
+      payload: { gameId: game.id, countdown },
     }, wss, clients);
     countdown--;
     if (countdown < 0) {
@@ -196,8 +196,8 @@ export function askQuestion(game: Game, games: Game[], wss: WebSocket.Server, cl
       questionIndex: game.currentQuestionIndex,
       totalQuestions: game.questionCount,
       question: question.questionText,
-      options: question.options
-    }
+      options: question.options,
+    },
   }, wss, clients);
 
   broadcastToAll(JSON.stringify({
@@ -208,8 +208,8 @@ export function askQuestion(game: Game, games: Game[], wss: WebSocket.Server, cl
       questionCount: game.questionCount,
       playerCount: game.players.length,
       playerNames: game.playerNames,
-      state: game.state
-    }
+      state: game.state,
+    },
   }), wss);
 
   if (game.timer) {
@@ -240,18 +240,18 @@ export function handleAnswer(ws: WebSocket, payload: { gameId: string, answer: s
     player.score++;
     broadcastToGame(game, {
       type: 'correct_answer',
-      payload: { 
-        playerName, 
-        gameId: game.id, 
+      payload: {
+        playerName,
+        gameId: game.id,
         correctAnswer: currentQuestion.options[currentQuestion.correctIndex],
-        scores: game.players.map(p => ({ name: p.name, score: p.score }))
-      }
+        scores: game.players.map(p => ({ name: p.name, score: p.score })),
+      },
     }, wss, clients);
-    
+
     if (game.timer) {
       clearTimeout(game.timer);
     }
-    
+
     game.timer = setTimeout(() => {
       game.players.forEach(p => p.answeredIncorrectly = false);
       askQuestion(game, games, wss, clients);
@@ -260,7 +260,7 @@ export function handleAnswer(ws: WebSocket, payload: { gameId: string, answer: s
     player.answeredIncorrectly = true;
     broadcastToGame(game, {
       type: 'incorrect_answer',
-      payload: { playerName, gameId: game.id }
+      payload: { playerName, gameId: game.id },
     }, wss, clients);
 
     if (allPlayersAnsweredIncorrectly(game)) {
@@ -271,15 +271,15 @@ export function handleAnswer(ws: WebSocket, payload: { gameId: string, answer: s
 
 export function endGame(game: Game, games: Game[], wss: WebSocket.Server, clients: Map<WebSocket, string>) {
   game.state = GameState.Ended;
-  const winner = game.players.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+  const winner = game.players.reduce((prev, current) => ((prev.score > current.score) ? prev : current));
   game.winner = winner.name;
   broadcastToGame(game, {
     type: 'game_end',
     payload: {
       gameId: game.id,
       scores: game.players.map(p => ({ name: p.name, score: p.score })),
-      winner: winner.name
-    }
+      winner: winner.name,
+    },
   }, wss, clients);
 
   const gameIndex = games.findIndex(g => g.id === game.id);
@@ -304,15 +304,15 @@ export function destroyGame(ws: WebSocket, gameId: string, games: Game[], client
 
   broadcastToGame(game, {
     type: 'game_destroyed',
-    payload: { 
+    payload: {
       gameId,
-      message: 'The game has been destroyed by the creator.'
-    }
+      message: 'The game has been destroyed by the creator.',
+    },
   }, wss, clients);
 
   broadcastToAll(JSON.stringify({
     type: 'game_destroy',
-    payload: { gameId }
+    payload: { gameId },
   }), wss);
 
   broadcastGameList(wss, games);
@@ -334,7 +334,7 @@ export function leaveGame(ws: WebSocket, payload: { gameId: string }, games: Gam
       games.splice(index, 1);
       broadcastToAll(JSON.stringify({
         type: 'game_destroy',
-        payload: { gameId: game.id }
+        payload: { gameId: game.id },
       }), wss);
     }
   } else {
@@ -346,14 +346,14 @@ export function leaveGame(ws: WebSocket, payload: { gameId: string }, games: Gam
         playerCount: game.players.length,
         players: game.players.map(p => p.name),
         player_names: game.playerNames,
-        message: `${playerName} has left the game.`
-      }
+        message: `${playerName} has left the game.`,
+      },
     }, wss, clients);
   }
 
   ws.send(JSON.stringify({
     type: 'game_left',
-    payload: { gameId: game.id }
+    payload: { gameId: game.id },
   }));
 
   broadcastGameList(wss, games);
@@ -365,8 +365,8 @@ function handleTimeUp(game: Game, games: Game[], wss: WebSocket.Server, clients:
     type: 'time_up',
     payload: {
       gameId: game.id,
-      correctAnswer: currentQuestion.options[currentQuestion.correctIndex]
-    }
+      correctAnswer: currentQuestion.options[currentQuestion.correctIndex],
+    },
   }, wss, clients);
 
   if (game.timer) {

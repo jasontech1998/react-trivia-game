@@ -1,13 +1,15 @@
 import WebSocket from 'ws';
 import { Game } from '../types';
 import { handleMessage } from '../messageHandler';
-import { getPlayerName, isValidPlayerName, addClientToGame, removePlayerFromGame } from './playerManagement';
+import {
+  getPlayerName, isValidPlayerName, addClientToGame, removePlayerFromGame,
+} from './playerManagement';
 import { removeGame, updateGameState } from './gameStateManagement';
 import { sendWelcomeMessages, sendErrorAndClose, notifyPlayersOfDeparture } from './notificationFunctions';
 
 export function handleNewConnection(webSocket: WebSocket, request: any, clients: Map<WebSocket, string>, games: Game[], wss: WebSocket.Server) {
   const playerName = getPlayerName(request);
-  
+
   if (!isValidPlayerName(playerName, clients)) {
     sendErrorAndClose(webSocket, 'name_taken', 'This name is already taken. Please choose a different name.');
     return;
@@ -33,14 +35,14 @@ export function handleClientMessage(webSocket: WebSocket, message: string, games
 export function handlePlayerDisconnect(webSocket: WebSocket, clients: Map<WebSocket, string>, games: Game[], wss: WebSocket.Server): void {
   const playerName = clients.get(webSocket);
   clients.delete(webSocket);
-  
+
   if (!playerName) return;
 
   const playerGames = games.filter(g => g.players.some(p => p.name === playerName));
-  
+
   playerGames.forEach(game => {
     removePlayerFromGame(game, playerName);
-    
+
     if (game.players.length === 0) {
       removeGame(game, games, wss);
     } else {

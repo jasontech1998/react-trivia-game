@@ -1,17 +1,27 @@
 {
-  root: true,
-  parser: "@typescript-eslint/parser",
-  plugins: [
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
     "@typescript-eslint"
   ],
-  extends: [
+  "extends": [
     "airbnb-base",
     "airbnb-typescript/base"
   ],
-  parserOptions: {
-    project: "./tsconfig.json"
+  "parserOptions": {
+    "project": "./tsconfig.json"
   },
-  rules: {
-    no-console: 0,
-  },
+  "rules": {
+    "no-console": 0,
+    "max-len": ["warn", { "code": 180 }],
+    "@typescript-eslint/comma-dangle": ["error", "only-multiline"],
+    "arrow-parens": ["error", "as-needed"],
+    "object-curly-newline": "off",
+    "@typescript-eslint/no-use-before-define": ["error", { "functions": false, "classes": true }],
+    "no-param-reassign": ["error", { "props": false }],
+    "no-plusplus": "off",
+    "import/prefer-default-export": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "no-return-assign": "off"
+  }
 }
