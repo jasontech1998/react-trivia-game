@@ -2,11 +2,9 @@ export interface Game {
   id: string;
   name: string;
   questionCount: number;
-  state: 'waiting' | 'countdown' | 'question' | 'ended';
-  playerNames: string[];
   playerCount: number;
-  winner?: string;
-  currentQuestionIndex?: number;
+  playerNames: string[];
+  state: 'waiting' | 'countdown' | 'question' | 'ended';
 }
 
 export interface Player {

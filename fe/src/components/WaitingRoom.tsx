@@ -22,7 +22,7 @@ const WaitingRoom: React.FC<WaitingRoomProps> = ({
       <h2 className="text-xl font-bold mb-2">Waiting Room: {gameName}</h2>
       <p className="text-sm mb-2">Questions: {questionCount}</p>
       <div className="mb-2">
-        <h3 className="text-lg font-semibold mb-1">Players:</h3>
+        <h3 className="text-lg font-semibold mb-1">Players ({players.length}):</h3>
         <ul className="text-sm space-y-1">
           {players.map((player, index) => (
             <li key={player} className="flex items-center">

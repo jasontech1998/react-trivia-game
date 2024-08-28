@@ -162,6 +162,7 @@ const TriviaGame: React.FC = () => {
 			payload: { gameId: currentGame.id, answer }
 		};
 		wsRef.current?.send(JSON.stringify(answerCommand));
+		setSelectedAnswer(answer);
 	};
 
 	const handleReturnToLobby = () => {
@@ -338,7 +339,8 @@ const TriviaGame: React.FC = () => {
 			case 'incorrect_answer':
 				setIncorrectPlayers(prev => [...prev, data.payload.playerName]);
 				if (data.payload.playerName === playerName) {
-					setSelectedAnswer(null); // Reset selected answer for the current player
+					// This is the current player's incorrect answer
+					// We don't need to reset selectedAnswer here anymore
 				}
 				break;
 			case 'time_up':
@@ -376,10 +378,12 @@ const TriviaGame: React.FC = () => {
 				break;
 			case 'game_update':
 				setGames(prevGames => prevGames.map(game => 
-					game.id === data.payload.id 
-						? { ...game, playerCount: data.payload.player_count, playerNames: data.payload.player_names }
-						: game
+					game.id === data.payload.id ? { ...game, ...data.payload } : game
 				));
+				if (currentGame && currentGame.id === data.payload.id) {
+					setCurrentGame(prevGame => ({ ...prevGame, ...data.payload }));
+					setPlayers(data.payload.playerNames);
+				}
 				break;
 			case 'game_destroyed':
 				setError(data.payload.message);
@@ -456,7 +460,7 @@ const TriviaGame: React.FC = () => {
 							) : isWaiting ? (
 								<WaitingRoom
 									gameName={currentGame.name}
-									players={currentGame.playerNames}
+									players={currentGame.playerNames || []}
 									isLeader={isLeader}
 									playerName={playerName}
 									gameMessages={gameMessages}
@@ -579,10 +583,7 @@ const TriviaGame: React.FC = () => {
 														{currentQuestion.options.map((option: string, index: number) => (
 															<li key={index}>
 																<button 
-																	onClick={() => {
-																		handleAnswer(option);
-																		setSelectedAnswer(option);
-																	}} 
+																	onClick={() => handleAnswer(option)}
 																	className={`w-full text-left p-3 rounded-lg transition duration-300 ease-in-out
 																		${
 																			selectedAnswer === option 

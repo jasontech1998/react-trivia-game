@@ -129,6 +129,19 @@ function joinGame(ws: WebSocket, payload: { gameId: string }, games: Game[], cli
   game.players.push({ name: playerName, score: 0, answeredIncorrectly: false });
   game.playerNames.push(playerName);
 
+  // Broadcast updated game information to all clients
+  broadcastToAll(JSON.stringify({
+    type: 'game_update',
+    payload: {
+      id: game.id,
+      name: game.name,
+      questionCount: game.questionCount,
+      playerCount: game.players.length,
+      playerNames: game.playerNames,
+      state: game.state
+    }
+  }), wss);
+
   ws.send(JSON.stringify({
     type: 'game_joined',
     payload: {
