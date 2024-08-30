@@ -30,7 +30,7 @@ app.get('/games', (req, res) => {
 
 // Server initialization
 server.listen(PORT, () => {
-  console.log(`Captrivia listening on port ${PORT}`);
+  console.log(`Backend listening on port ${PORT}`);
 });
 
 export { games, clients, wss };

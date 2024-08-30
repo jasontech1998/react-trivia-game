@@ -16,7 +16,7 @@ export interface Game {
   name: string;
   questionCount: number;
   players: Player[];
-  state: GameState; // This now uses the GameState enum
+  state: GameState;
   currentQuestionIndex: number;
   questions: Question[];
   winner?: string;

@@ -459,7 +459,8 @@ const TriviaGame: React.FC = () => {
   };
 
   const gameState = currentGame?.state;
-  const isInGame = gameState && ["countdown", "question", "ended"].includes(gameState);
+  const isInGame =
+    gameState && ["countdown", "question", "ended"].includes(gameState);
   const isWaiting = gameState === "waiting";
 
   return (
@@ -530,7 +531,7 @@ const TriviaGame: React.FC = () => {
           <div className="p-6 sm:p-10">
             <div className="mx-auto max-w-2xl">
               <h1 className="text-4xl font-bold mb-6 text-center text-emerald-600">
-                Pulley Trivia Game
+                React Trivia Game
               </h1>
 
               {apiError && (
@@ -729,19 +730,20 @@ const TriviaGame: React.FC = () => {
         {/* Bottom card - Connected Players (only shown when not in game) */}
         {isConnected && !isInGame && (
           <div className="bg-gradient-to-r from-purple-400 to-indigo-500 shadow-lg rounded-3xl mt-4 p-6">
-            <h2 className="text-2xl font-bold mb-4 text-white">
-              Connected Players
-            </h2>
+            <h2 className="text-2xl font-bold mb-4 text-white">Connected Players</h2>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {connectedPlayers.map((player, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between text-lg font-semibold bg-white bg-opacity-20 rounded-md px-3 py-1 shadow-sm"
+                  className="flex items-center justify-between text-lg font-semibold bg-white bg-opacity-20 rounded-md px-3 py-2 shadow-sm transition-all duration-300 hover:bg-opacity-30"
                 >
-                  <span>{player}</span>
+                  <span className="flex items-center">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+                    {player}
+                  </span>
                   {player === playerName && (
                     <div className="flex items-center">
-                      <span className="mr-2">(You)</span>
+                      <span className="mr-2 text-yellow-300">(You)</span>
                       <button
                         onClick={handleDisconnect}
                         className="bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"

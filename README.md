@@ -1,23 +1,18 @@
-# captrivia-starter
+Trivia Game
 
-This repository serves as a starting point for solutions for Pulley's Captrivia takehome test. You can use
-this or you can create your own.
+This is a trivia game built with React and TypeScript. It allows users to play trivia games and track their progress.
 
-## Frontend
+## Features
 
-For frontend, there's only a single choice of starter at the moment.
+- User authentication
+- Game creation
+- Game joining
+- Question answering
 
-| Language | Directory |
-|----------|-----------|
-| React+TS | [fe](fe)  |
+## Technologies Used
 
-## Backend
+- React
+- TypeScript
+- Node.js
+- Websockets
 
-For backend, there's various starter languages.
-
-| Language   | Directory                      |
-|------------|--------------------------------|
-| Go         | [be/go](be/go)                 |
-| Node.js    | [be/node](be/node) |
-| Java       | [be/java](be/java)             |
-| Python     | [be/python](be/python)         |

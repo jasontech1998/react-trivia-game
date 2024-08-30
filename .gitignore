@@ -1,5 +1,5 @@
 # Backend binary
-captrivia-be
+trivia-game-be
 
 tmp
 
@@ -31,10 +31,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Java
-be/java/captrivia/dependency-reduced-pom.xml
-be/java/captrivia/target/*
 
 # Node
 be/node/build/*
